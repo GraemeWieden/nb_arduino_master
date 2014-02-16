@@ -614,7 +614,13 @@ bool RCSwitch::receiveProtocol1(unsigned int changeCount)
 		}
 	}
 	code = code >> 1;
-	if (changeCount >47) 
+  if (changeCount == 47) // fix for 23 bit swann remote
+  {
+    code = code << 1;
+    changeCount = 49;
+  }
+
+  if (changeCount >45)
 	{
 		if(code>0)
 		{
