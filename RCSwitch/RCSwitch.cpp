@@ -57,7 +57,7 @@ void RCSwitch::setProtocol(int nProtocol)
 	this->nProtocol = nProtocol;
 	if (nProtocol == 1)
 	{
-		this->setPulseLength(350);
+		this->setPulseLength(450);
 	}
 	else if (nProtocol == 2) {
 		this->setPulseLength(650);
