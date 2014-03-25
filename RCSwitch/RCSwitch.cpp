@@ -715,7 +715,7 @@ bool RCSwitch::receiveWT450(unsigned int changeCount)
 		{
 			// Failed
 			i = changeCount;
-			if (i<50)	
+			if (i<42)	
 			{
 				code = 0;
 			}
@@ -724,7 +724,7 @@ bool RCSwitch::receiveWT450(unsigned int changeCount)
 	}
 		
 	code = code >> 1;
-	if ((changeCount > 50) && (bitLength==36))
+	if ((changeCount > 42) && (bitLength==36))
 	{
 		// there is no checksum of this unit, so using preamble and 2 fixed bits to check
 		// Preamble= 1100 (first four bits)
