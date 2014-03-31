@@ -681,6 +681,69 @@ bool RCSwitch::receiveProtocol2(unsigned int changeCount)
 		return true;
 }
 */
+
+bool RCSwitch::receiveB00(unsigned int changeCount)
+{
+  // our own protocol is called B00 as it says Boo! to announce itself 
+  // the last byte (00) may eventually be used as a content descriptor
+  // by default, the descriptor is 0 indicating the following packet payload:
+  // 12 bits: B00
+  // 4 bits: 2 bit house code - 2 bit channel code
+  // 16 bits: integer value 1
+  // 16 bits: integer value 2
+  // total: 48 bits
+  // other content descriptors may be introduced in future for other packet payload needs
+
+  //char strBuffer[12];
+  //sprintf(strBuffer, "count %d", changeCount);
+  //Serial.println(strBuffer);
+
+  unsigned long long code = 0;
+  //unsigned long longPulse = RCSwitch::timings[0] / 10; // one tenth the sync pulse for the long pulse
+  unsigned long longPulse =1000;
+
+  //unsigned long shortPulse = longPulse / 3;
+  //unsigned long delayTolerance = shortPulse * 0.3; // 30% tolerance
+  unsigned long shortPulse = 333;
+  unsigned long delayTolerance = 100; // 30% tolerance
+
+  for (unsigned int i = 1; i < changeCount; i = i + 2)
+  {
+    if (RCSwitch::timings[i] > shortPulse - delayTolerance && RCSwitch::timings[i] < shortPulse + delayTolerance && RCSwitch::timings[i + 1] > longPulse - delayTolerance && RCSwitch::timings[i + 1] < longPulse + delayTolerance)
+    {
+      code = code << 1;
+    }
+    else if (RCSwitch::timings[i] > longPulse - delayTolerance && RCSwitch::timings[i] < longPulse + delayTolerance && RCSwitch::timings[i + 1] > shortPulse - delayTolerance && RCSwitch::timings[i + 1] < shortPulse + delayTolerance)
+    {
+      code += 1;
+      code = code << 1;
+    }
+    else
+    {
+      // Failed
+      i = changeCount;
+      code = 0;
+    }
+  }
+  code = code >> 1;
+
+  if (changeCount == 97) // 48 bit
+  {
+    if (code>0)
+    {
+      RCSwitch::nReceivedValue = code;
+      RCSwitch::nReceivedBitlength = changeCount / 2;
+      RCSwitch::nReceivedDelay = shortPulse;
+      RCSwitch::nReceivedProtocol = 6;
+    }
+  }
+
+  if (code == 0)
+    return false;
+  else
+    return true;
+}
+
 bool RCSwitch::receiveWT450(unsigned int changeCount)
 {
 	unsigned long long code = 0ull;
@@ -745,6 +808,7 @@ bool RCSwitch::receiveWT450(unsigned int changeCount)
 
 bool RCSwitch::receiveLaCrosse(unsigned int changeCount)
 {
+  /*
 	unsigned long long code = 0ull;
 	unsigned long delay = RCSwitch::timings[0] / 3;
 	//unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
@@ -793,7 +857,7 @@ bool RCSwitch::receiveLaCrosse(unsigned int changeCount)
 		return false;
 	else
 		return true;
-	
+    */
 }
 
 void RCSwitch::handleInterrupt()
@@ -814,7 +878,14 @@ void RCSwitch::handleInterrupt()
 		{
 			if(changeCount>20)
 			{
-				if (changeCount>80)
+        if (changeCount > 90)
+        {
+          if (receiveB00(changeCount) == false)
+          {
+            //failed
+          }
+        }
+				else if (changeCount>80)
 				{
 					if (receiveLaCrosse(changeCount) == false)
 					{

@@ -91,6 +91,8 @@ class RCSwitch {
 		static bool receiveProtocol2(unsigned int changeCount);
 		static bool receiveLaCrosse(unsigned int changeCount);
 		static bool receiveWT450(unsigned int changeCount);
+    static bool receiveB00(unsigned int changeCount);
+
 		int nReceiverInterrupt;
 		int nTransmitterPin;
 		int nPulseLength;

@@ -838,8 +838,37 @@ void NinjaObjects::doWT450(unsigned long long value)
 	
 }
 
+void NinjaObjects::doB00(unsigned long long value)
+{
+  char strGUID[11]; // B00_cchhcc
+  char strBuffer[12]; // xxxxx,xxxxx
+  unsigned long long data;
+  byte content = 0;
+  byte house = 0;
+  byte channel = 0;
+  unsigned int value1 = 0;
+  unsigned int value2 = 0;
+
+  data = value;
+  // 12 bits: B00
+  // 4 bits: 2 bit house code - 2 bit channel code
+  // 16 bits: integer value 1
+  // 16 bits: integer value 2
+  content = (data >> 36) & (0xff);
+  house = (data >> 34) & (0x03);
+  channel = (data >> 32) & (0x03);
+  value1 = (data >> 16) & (0xffff);
+  value2 = data & (0xffff);
+
+  //sprintf(strGUID, "B00_%02d%02d%02d", content, house, channel);
+  sprintf(strGUID, "%02d%02d", house, channel);
+  sprintf(strBuffer, "%u,%u", value1, value2);
+  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0); // 2816 is decimal for B00
+}
+
 void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
 {
+  /*
 	byte nibble[10];
 	char strAddress[3];
 	unsigned long long mask=0x0f;
@@ -870,10 +899,12 @@ void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
 			doJSONData(strAddress, 0, 13, NULL, realValue, false,0);
 		}
 	}
+  */
 }
 
 void NinjaObjects::doLacrosseWS2355(unsigned long long ws2344value)
 {
+  /*
 	byte nibble[12];
 	byte windir;
 	unsigned long long mask=0x0f;
@@ -938,6 +969,7 @@ void NinjaObjects::doLacrosseWS2355(unsigned long long ws2344value)
 				break;
 		}
 	}
+  */
 }
 
 unsigned long long previousValue = 0;
@@ -955,7 +987,7 @@ void NinjaObjects::do433(void)
 
 	mySwitch.enableReceive(RX433_INT);
 
-	if (mySwitch.available() && (mySwitch.getReceivedProtocol()>0 && mySwitch.getReceivedProtocol()<6))
+	if (mySwitch.available() && (mySwitch.getReceivedProtocol()>0 && mySwitch.getReceivedProtocol()<7))
 	{
 		unsigned long long value = mySwitch.getReceivedValue();
 		unsigned long long diff = value - previousValue;
@@ -993,6 +1025,8 @@ void NinjaObjects::do433(void)
 				doLacrosseWS2355(value);
 			else if(mySwitch.getReceivedProtocol()==5)
 				doWT450(value);
+      else if (mySwitch.getReceivedProtocol() == 6)
+        doB00(value);
 			else
 			{		
 				if (mySwitch.getReceivedBitlength()> (DATA_LEN/2))
