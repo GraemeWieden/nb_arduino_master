@@ -861,9 +861,12 @@ void NinjaObjects::doB00(unsigned long long value)
   value2 = data & (0xffff);
 
   //sprintf(strGUID, "B00_%02d%02d%02d", content, house, channel);
-  sprintf(strGUID, "%02d%02d", house, channel);
-  sprintf(strBuffer, "%u,%u", value1, value2);
-  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0); // 2816 is decimal for B00
+  sprintf(strGUID, "%02d%02d0", house, channel);
+  sprintf(strBuffer, "%u", value1);
+  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0);
+  sprintf(strGUID, "%02d%02d1", house, channel);
+  sprintf(strBuffer, "%u", value2);
+  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0);
 }
 
 void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
