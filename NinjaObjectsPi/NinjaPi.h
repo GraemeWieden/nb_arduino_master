@@ -69,6 +69,7 @@ class NinjaPi {
 		void doLacrosseTX3(unsigned long long tx3value);
 		void doLacrosseWS2355(unsigned long long ws2344value);
 		void doWT450(unsigned long long value);
+    void doB00(unsigned long long value);
 		//send device to cloud
 		inline void doDevice(Device *d) {
 			//doJSONData(char * strGUID, int intVID, int intDID
