@@ -895,7 +895,7 @@ void NinjaObjects::doB00(unsigned long long value)
     sprintf(strData, "%u,%u", (int)(ulValue >> 16), (int)(ulValue & 0xFFFF));
     break;
   case 5: // 4 x byte values
-	sprintf(strData, "%x %x %x %x", ulValue >> 24, ulValue >> 16 & 0xFF, ulValue >> 8 & 0xFF, ulValue & 0xFF); 
+	  sprintf(strData, "%x %x %x %x", ulValue >> 24, ulValue >> 16 & 0xFF, ulValue >> 8 & 0xFF, ulValue & 0xFF); 
     break;
   }
 
@@ -904,7 +904,6 @@ void NinjaObjects::doB00(unsigned long long value)
 
 void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
 {
-  /*
 	byte nibble[10];
 	char strAddress[3];
 	unsigned long long mask=0x0f;
@@ -935,12 +934,10 @@ void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
 			doJSONData(strAddress, 0, 13, NULL, realValue, false,0);
 		}
 	}
-  */
 }
 
 void NinjaObjects::doLacrosseWS2355(unsigned long long ws2344value)
 {
-  /*
 	byte nibble[12];
 	byte windir;
 	unsigned long long mask=0x0f;
@@ -1005,7 +1002,6 @@ void NinjaObjects::doLacrosseWS2355(unsigned long long ws2344value)
 				break;
 		}
 	}
-  */
 }
 
 unsigned long long previousValue = 0;
@@ -1094,9 +1090,11 @@ void NinjaObjects::do433(void)
 	if (Serial.available()>0) doReactors();
 }
 
+// Hack to free up some space in the Arduino.
+// I'm not using anything connected to the hardward ports, so just return from these functions
 boolean NinjaObjects::doPort1(byte* DHT22_PORT)
 {
-	return false;
+  return false; // hack to free up space
 
 	int tempID=0;
 	
@@ -1184,7 +1182,8 @@ boolean NinjaObjects::doPort1(byte* DHT22_PORT)
 
 boolean NinjaObjects::doPort2(byte* DHT22_PORT)
 {
-	return false;
+  return false; // hack to free up space
+
 	int tempID=0;
 
 	boolean IsDHT22=false;
@@ -1259,7 +1258,8 @@ boolean NinjaObjects::doPort2(byte* DHT22_PORT)
 
 boolean NinjaObjects::doPort3(byte* DHT22_PORT)
 {
-	return false;
+  return false; // hack to free up space
+
 	int tempID=0;
 	boolean IsDHT22=false;
 	*DHT22_PORT=0;	
@@ -1330,7 +1330,6 @@ boolean NinjaObjects::doPort3(byte* DHT22_PORT)
 	if (Serial.available()>0) doReactors();
 	return IsDHT22;
 }
-
 
 void NinjaObjects::doDHT22(byte port)
 {

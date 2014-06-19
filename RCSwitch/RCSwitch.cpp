@@ -802,7 +802,6 @@ bool RCSwitch::receiveWT450(unsigned int changeCount)
 
 bool RCSwitch::receiveLaCrosse(unsigned int changeCount)
 {
-  /*
 	unsigned long long code = 0ull;
 	unsigned long delay = RCSwitch::timings[0] / 3;
 	//unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;    
@@ -851,7 +850,6 @@ bool RCSwitch::receiveLaCrosse(unsigned int changeCount)
 		return false;
 	else
 		return true;
-    */
 }
 
 void RCSwitch::handleInterrupt()

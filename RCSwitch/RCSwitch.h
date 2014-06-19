@@ -32,7 +32,7 @@
 #endif
 
 // We can handle up to (unsigned long long) => 64 bit * 2 H/L changes per bit + 2 for sync
-#define RCSWITCH_MAX_CHANGES 120
+#define RCSWITCH_MAX_CHANGES 104
 
 class RCSwitch {
 
