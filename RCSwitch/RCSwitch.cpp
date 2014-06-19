@@ -684,27 +684,21 @@ bool RCSwitch::receiveProtocol2(unsigned int changeCount)
 
 bool RCSwitch::receiveB00(unsigned int changeCount)
 {
-  // our own protocol is called B00 as it says Boo! to announce itself 
-  // the last byte (00) may eventually be used as a content descriptor
-  // by default, the descriptor is 0 indicating the following packet payload:
-  // 12 bits: B00
-  // 4 bits: 2 bit house code - 2 bit channel code
-  // 16 bits: integer value 1
-  // 16 bits: integer value 2
-  // total: 48 bits
-  // other content descriptors may be introduced in future for other packet payload needs
+	// This protocol is called B00 as it says Boo! to announce itself 
+	// The B00 protocol is returned as Protocol 6
+	// The packet is a total of 50 bits made up of:
+	// 12 bits: B00 to announce and content descriptor (see below)
+	// 5 bits: 2 bit house code 3 bit channel code
+	// 32 bits: content
+	// 1 bit: even parity
 
   //char strBuffer[12];
   //sprintf(strBuffer, "count %d", changeCount);
   //Serial.println(strBuffer);
 
   unsigned long long code = 0;
-  //unsigned long longPulse = RCSwitch::timings[0] / 10; // one tenth the sync pulse for the long pulse
-  unsigned long longPulse =1000;
-
-  //unsigned long shortPulse = longPulse / 3;
-  //unsigned long delayTolerance = shortPulse * 0.3; // 30% tolerance
-  unsigned long shortPulse = 333;
+  unsigned long longPulse =967;
+  unsigned long shortPulse = 322;
   unsigned long delayTolerance = 100; // 30% tolerance
 
   for (unsigned int i = 1; i < changeCount; i = i + 2)
@@ -727,7 +721,7 @@ bool RCSwitch::receiveB00(unsigned int changeCount)
   }
   code = code >> 1;
 
-  if (changeCount == 97) // 48 bit
+  if (changeCount == 101) // 50 bit
   {
     if (code>0)
     {

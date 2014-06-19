@@ -840,33 +840,66 @@ void NinjaObjects::doWT450(unsigned long long value)
 
 void NinjaObjects::doB00(unsigned long long value)
 {
-  char strGUID[11]; // B00_cchhcc
-  char strBuffer[12]; // xxxxx,xxxxx
-  unsigned long long data;
-  byte content = 0;
-  byte house = 0;
-  byte channel = 0;
-  unsigned int value1 = 0;
-  unsigned int value2 = 0;
+  // check the parity bit for even parity
+  boolean checkParity = value & 1;
+  boolean runningParity = 0;
 
-  data = value;
-  // 12 bits: B00
-  // 4 bits: 2 bit house code - 2 bit channel code
-  // 16 bits: integer value 1
-  // 16 bits: integer value 2
-  content = (data >> 36) & (0xff);
-  house = (data >> 34) & (0x03);
-  channel = (data >> 32) & (0x03);
-  value1 = (data >> 16) & (0xffff);
-  value2 = data & (0xffff);
+  for (int i = 1; i < 50; i++)
+  {
+    value = value >> 1;
+    if(value & 1)
+      runningParity = !runningParity;
+  }
+  if(runningParity != checkParity)
+	  return; // parity check failed
 
-  //sprintf(strGUID, "B00_%02d%02d%02d", content, house, channel);
-  sprintf(strGUID, "%02d%02d0", house, channel);
-  sprintf(strBuffer, "%u", value1);
-  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0);
-  sprintf(strGUID, "%02d%02d1", house, channel);
-  sprintf(strBuffer, "%u", value2);
-  doJSONData(strGUID, 0, 225, strBuffer, 0, true, 0);
+  char strGUID[10]; // B0x_ch
+  char strData[20];
+
+	// The packet is a total of 50 bits made up of:
+	// 12 bits: B00 to announce and content descriptor (see below)
+	// 5 bits: 2 bit house code 3 bit channel code
+	// 32 bits: content
+	// 1 bit: even parity
+
+  byte contentType = value >> 38 & 0xF;
+  byte houseCode = value >> 36 & 0x3;
+  byte channelCode = value >> 33 & 0x7;
+  
+  sprintf(strGUID, "B0%01d_%01d%01d", contentType, houseCode, channelCode);
+
+  // we create a union of a double and unsigned long so we can use the bit pattern 
+  // without modification between data types
+  union
+  {
+    double dblValue;
+    unsigned long ulValue;
+  };
+  ulValue = value >> 1 &0xFFFFFFFF;
+
+  switch (contentType) 
+  {
+  case 0: // double precision floating point value
+	dtostrf(dblValue, 7, 3, strData); 
+    break;
+  case 1: // long signed integer value
+    sprintf(strData, "%ld", ulValue);
+    break;
+  case 2: // long unsigned integer value
+    sprintf(strData, "%lu", ulValue);
+    break;
+  case 3: // 2 x signed integer values
+    sprintf(strData, "%d,%d", (int)(ulValue >> 16), (int)(ulValue & 0xFFFF));     
+    break;
+  case 4: // 2 x unsigned integer values
+    sprintf(strData, "%u,%u", (int)(ulValue >> 16), (int)(ulValue & 0xFFFF));
+    break;
+  case 5: // 4 x byte values
+	sprintf(strData, "%x %x %x %x", ulValue >> 24, ulValue >> 16 & 0xFF, ulValue >> 8 & 0xFF, ulValue & 0xFF); 
+    break;
+  }
+
+  doJSONData(strGUID, 0, 1002, strData, 0, true, 0);
 }
 
 void NinjaObjects::doLacrosseTX3(unsigned long long tx3value)
@@ -1063,6 +1096,8 @@ void NinjaObjects::do433(void)
 
 boolean NinjaObjects::doPort1(byte* DHT22_PORT)
 {
+	return false;
+
 	int tempID=0;
 	
 	boolean IsDHT22=false;
@@ -1149,6 +1184,7 @@ boolean NinjaObjects::doPort1(byte* DHT22_PORT)
 
 boolean NinjaObjects::doPort2(byte* DHT22_PORT)
 {
+	return false;
 	int tempID=0;
 
 	boolean IsDHT22=false;
@@ -1223,6 +1259,7 @@ boolean NinjaObjects::doPort2(byte* DHT22_PORT)
 
 boolean NinjaObjects::doPort3(byte* DHT22_PORT)
 {
+	return false;
 	int tempID=0;
 	boolean IsDHT22=false;
 	*DHT22_PORT=0;	
