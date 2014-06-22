@@ -686,22 +686,14 @@ bool RCSwitch::receiveB00(unsigned int changeCount)
 {
 	// This protocol is called B00 as it says Boo! to announce itself 
 	// The B00 protocol is returned as Protocol 6
-	// The packet is a total of 50 bits made up of:
-	// 12 bits: B00 to announce and content descriptor (see below)
-	// 5 bits: 2 bit house code 3 bit channel code
-	// 32 bits: content
-	// 1 bit: even parity
-
-  //char strBuffer[12];
-  //sprintf(strBuffer, "count %d", changeCount);
-  //Serial.println(strBuffer);
+	// The packet is a total of 50 bits including an even parity bit
 
   unsigned long long code = 0;
-  unsigned long longPulse =967;
-  unsigned long shortPulse = 322;
-  unsigned long delayTolerance = 100; // 30% tolerance
+  unsigned long longPulse = 900;
+  unsigned long shortPulse = 300;
+  unsigned long delayTolerance = 100; // about 30% tolerance
 
-  for (unsigned int i = 1; i < changeCount; i = i + 2)
+  for (unsigned int i = 1; i < changeCount - 2; i = i + 2)
   {
     if (RCSwitch::timings[i] > shortPulse - delayTolerance && RCSwitch::timings[i] < shortPulse + delayTolerance && RCSwitch::timings[i + 1] > longPulse - delayTolerance && RCSwitch::timings[i + 1] < longPulse + delayTolerance)
     {
@@ -721,12 +713,12 @@ bool RCSwitch::receiveB00(unsigned int changeCount)
   }
   code = code >> 1;
 
-  if (changeCount == 101) // 50 bit
+  if (changeCount == 102) // 50 bit plus sync
   {
     if (code>0)
     {
       RCSwitch::nReceivedValue = code;
-      RCSwitch::nReceivedBitlength = changeCount / 2;
+      RCSwitch::nReceivedBitlength = 50;
       RCSwitch::nReceivedDelay = shortPulse;
       RCSwitch::nReceivedProtocol = 6;
     }
