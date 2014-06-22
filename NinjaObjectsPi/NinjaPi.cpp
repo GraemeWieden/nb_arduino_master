@@ -506,22 +506,23 @@ void NinjaPi::doB00(unsigned long long value)
 {
   // check the parity bit for even parity
   boolean checkParity = value & 1;
+  unsigned long long checkValue = value;
   boolean runningParity = 0;
 
   for (int i = 1; i < 50; i++)
   {
-    value = value >> 1;
-    if (value & 1)
+    checkValue = checkValue >> 1;
+    if (checkValue & 1)
       runningParity = !runningParity;
   }
   if (runningParity != checkParity)
     return; // parity check failed
 
-  char strGUID[10]; // B0x_ch
+  char strGUID[10];
   char strData[20];
 
   // The packet is a total of 50 bits made up of:
-  // 12 bits: B00 to announce and content descriptor (see below)
+  // 12 bits: B00 to announce and content descriptor
   // 5 bits: 2 bit house code 3 bit channel code
   // 32 bits: content
   // 1 bit: even parity
@@ -530,7 +531,8 @@ void NinjaPi::doB00(unsigned long long value)
   byte houseCode = value >> 36 & 0x3;
   byte channelCode = value >> 33 & 0x7;
 
-  sprintf(strGUID, "B0%01d_%01d%01d", contentType, houseCode, channelCode);
+  // note that the dashboard doesn't seem to support guids with underscores
+  sprintf(strGUID, "B0%01d%01d%01d", contentType, houseCode, channelCode);
 
   // we create a union of a double and unsigned long so we can use the bit pattern 
   // without modification between data types
@@ -559,11 +561,15 @@ void NinjaPi::doB00(unsigned long long value)
     sprintf(strData, "%u,%u", (int)(ulValue >> 16), (int)(ulValue & 0xFFFF));
     break;
   case 5: // 4 x byte values
-    sprintf(strData, "%x %x %x %x", ulValue >> 24, ulValue >> 16 & 0xFF, ulValue >> 8 & 0xFF, ulValue & 0xFF);
+    sprintf(strData, "%x %x %x %x", (byte)(ulValue >> 24), (byte)(ulValue >> 16 & 0xFF), (byte)(ulValue >> 8 & 0xFF), (byte)(ulValue & 0xFF));
     break;
   }
 
-  doJSONData(strGUID, 0, 1002, strData, 0, true, 0);
+  // we need to send the data as a NB device ID that supports 'sensor' and 'time series' data.
+  // as there doesn't appear to be any generic devices like this defined, we'll have to use something else.
+  // device ID 225 is a 'moisture sensor' device with time series data supported. let's use that.
+
+  doJSONData(strGUID, 0, 225, strData, 0, true, 0);
 }
 
 void NinjaPi::doLacrosseTX3(unsigned long long tx3value)

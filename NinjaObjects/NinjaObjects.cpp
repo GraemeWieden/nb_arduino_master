@@ -854,7 +854,7 @@ void NinjaObjects::doB00(unsigned long long value)
   if(runningParity != checkParity)
 	  return; // parity check failed
 
-  char strGUID[10]; // B0x_ch
+  char strGUID[10];
   char strData[20];
 
 	// The packet is a total of 50 bits made up of:
