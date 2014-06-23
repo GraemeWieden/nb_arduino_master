@@ -1,6 +1,25 @@
-B00 Branch
 Ninja Blocks Arduino Source Code.
+The B00 branch is a modified master branch to support the B00 Protocol
+
 Developed by www.ninjablocks.com based on Arduino and other Open Source libraries.
+
+22nd June 2014 by Graeme Wieden
+	- Finalised B00 protocol support for BeagleBone and migrated to Pi code
+
+19th June 2014 by Graeme Wieden
+	- Added new and improved 50 bit B00 handler to supports a variety of content data types and a parity bit
+
+24th April 2014 by Graeme Wieden
+	- Migrated handler for B00 protocol to Pi code
+
+31st March 2014 by Graeme Wieden
+	- Added handler for B00 protocol. The B00 protocol uses the same encoding mechanism as 'protocol 1' however it uses 48 bits to carry a content descriptor, house code, channel code and 2x16 bit integer values.
+
+25th March 2014 by Graeme Wieden
+	- Fixed bug causing dropped WT450 packets. Packets with less than 50 state changes were being filtered out.
+	
+16th February 2014 by Graeme Wieden
+	- Allow receive of 3xAA Swann doorchime. The 3xAA version (not the 3xAAA version) uses 23 bits of data instead of 24.
 
 Version 0.45: 21st December 2012 by JZ
 	- added DID defines
